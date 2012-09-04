@@ -1,0 +1,176 @@
+.TH batsh 1V v3.0 "Internet Connection, Inc." "Virtual Hosting Manual"
+.SH NAME
+batsh \- non interactive batch processing for very long running programs
+.SH SYNOPSIS
+.B #!/usr/bin/batsh < message
+
+.I fd#0
+must be attached to a seekable file. the script filename will be the first
+argument to batsh (so
+.B #!
+will work normally)
+.SH DESCRIPTION
+.I batsh
+is used to batch-process extremely long running programs with a per-user
+concurrency.
+.I batsh
+scripts are designed to be run by
+.I qmail-local(8)
+or
+.I cron(8)
+in such a way that
+.I batsh
+jobs won't interfere with other users of the system.
+
+.I batsh
+programs perform part of the job in each run. their exit code is arranged
+such that
+.I qmail-local(8)
+will consider most of the time that batsh exits a temporary failure and will
+try again shortly.
+
+As such,
+.I batsh
+programs can be restarted at any point without necessarily re-running earlier
+jobs in the list.
+.SS SCRIPT FORMAT
+.I batsh
+programs have a trivial format that is reasonably easy for humans to read, and
+extremely easy for programs to read.
+
+Each line is a separate command to the
+.I batsh
+processor.
+.TP
+.BR | exe...
+pass exe to
+.B /bin/sh\ -c
+and record it's status code. if it returns 111 it will be started again, if
+it returns 98, it will abort processing immediately and cause
+.I batsh
+to exit 0. exit code 97 is silently wrapped onto exit code 0. this is to
+simplify some shell-handling. all other exits are passed up to whatever calls the
+.I batsh
+script when the status code is read.
+.TP
+.BR ! exe...
+pass exe to
+.B /bin/sh\ -c
+and return it's status code immediately. the commands
+.I exec
+and
+.I exit
+are handled specially and will always terminate the script/session.
+.TP
+.BR ? q
+.TP
+.BR ?! q
+q is a question; one of:
+.BR $ env
+,
+.BR -X filespec
+,
+.B [
+exe ],
+.BR ` exe
+,
+.BR filespec
+
+All unary operators supported by
+.I test(1)
+are supported using the
+.BR -X
+format. Using
+.BR ` exe
+will execute
+.B exe
+and if it exits 0, the test succeeds. Using
+.B [
+exe ] is syntactic sugar for executing
+
+.B [ exe ]
+ala test.
+
+If the question-test succeeds, then process normally, otherwise suspend
+processing until we see a line with a
+.B ;
+by itself.
+.TP
+.BR ;
+move up a nesting level for comparisons.
+.TP
+.BR & exe
+causes
+.B exe
+as soon as possible right before ending the current operation. in this way,
+the schedular can be commanded to restart (if it's idle) as soon as possible.
+
+Note that these trailing operations are installed when-seen (so they can be
+conditionally installed). this usually means you want these operations near
+the beginning of the fil.e
+.TP
+.BR + env=value
+put env=value into the environment.
+.TP
+.BR - env
+remove env from the environment.
+.TP
+.BR # line
+ignore this line
+.SS EXIT CODES
+.I batsh
+assumes 111 will be treated as a temporary failure and will get it called
+again in the near future and that exit code 1 will generate a more permenent
+failure (when the script is started incorrectly).
+
+.I batsh
+will otherwise pass return codes up from it's children, only keeping 127,
+97, 98, and 111 for itself.
+
+Exit code 127 is used by the
+system(3)
+library call if /bin/sh cannot be started.
+
+.SS ENVIRONMENT
+.I batsh
+uses the
+.B BATSH_CONCURRENCY
+environment variable to override it's own concurrency defaults of 10
+concurrent batsh programs running per-user. It is
+.B not
+recommended that users raise this value as it will
+.B not
+make
+.I batsh
+programs run faster or complete faster.
+
+.B BATSH_MAXDEPTH
+can specify an upper-bound limit on how many times
+.I batsh
+will allow itself to be nested.
+
+.B BATSH_LEVEL
+is used to determine how many times it has currently been nested.
+
+.I batsh
+also requires that
+.B HOME
+be set up correctly on startup.
+
+
+.SS DIAGNOSTICS
+.I batsh
+can be traced by setting the environment variable
+.B BATSH_TRACE
+which will cause lots of information to be spit out on standard error
+about what it's doing.
+
+.SH FILES
+~/.qmail.mproc.concurrency-*
+~/.qmail.qtmp.batsh.*.*.*
+~/.qmail.jlog.*
+
+Note these can be changed at compile-time.
+
+.SH SEE ALSO
+test(1), system(3), qmail-local(8), qmail-command(8), cron(8)

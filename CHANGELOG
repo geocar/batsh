@@ -1,0 +1,119 @@
+2006-03-01 17:12  geocar
+
+	* unix/batsh.c: add the recipient address to journal name (makes
+	  things faster)
+
+2006-01-27 08:46  geocar
+
+	* unix/batsh.c: twophase hack
+
+2006-01-23 14:21  geocar
+
+	* unix/batsh.c: yay, fix depot-doc bug, add big lock around batsh,
+	  stop dspam nonsense
+
+2005-04-04 05:39  geocar
+
+	* doc/batsh.1: fix typo
+
+2005-03-03 07:40  geocar
+
+	* unix/batsh.c: move concurrency check; set close-on-exec flag;
+	  this allows the concurrency check to actually _work_ on solaris
+
+2005-03-03 07:40  geocar
+
+	* common/lock.c: use lockf on solaris; support for lockf
+
+2004-12-14 11:20  geocar
+
+	* unix/batsh.c: absolute paths for dspam, batsh increases
+	  concurrency
+
+2004-09-27 14:47  geocar
+
+	* unix/batsh.c, doc/batsh.1: support for user-defined closures,
+	  actually cleaning up better if chdir'd, getting ARG_MAX from
+	  compiler-limits.
+
+2004-09-27 14:02  geocar
+
+	* unix/batsh.c: support commands in "!" mode that begin with "exec"
+	  or "exit" :)
+
+2004-09-24 14:47  geocar
+
+	* unix/batsh.c, doc/batsh.1: sf-report now calls dspam cron
+	  (finally), batsh has some bugfixes with regards to exec and exit
+	  handling.
+
+2004-09-23 20:20  geocar
+
+	* unix/batsh.c: batch treats exec and exit commands specially for
+	  "!" commands. this way, svfilter doesn't need crazy reordering
+	  rules...
+
+2004-07-26 18:23  geocar
+
+	* unix/batsh.c: bugfixes for when qmail is going "really really"
+	  fast, rewind more often, and line fix
+
+2004-06-16 00:15  geocar
+
+	* unix/batsh.c: suexec2 program add (possibly unnecessary, here's
+	  to hoping!) and support for system-wide default concurrencies...
+
+2004-06-11 17:51  geocar
+
+	* unix/batsh.c: lowered concurrency down to 3
+
+2004-06-11 16:19  geocar
+
+	* unix/batsh.c: close fd1 and 2 when forking so we can disconnect
+	  from qmail-local
+
+2004-06-09 20:08  geocar
+
+	* unix/batsh.c, common/lock.c, doc/batsh.1: make the locking code
+	  sane, add tracing code to batsh, error reporting to maildir,
+	  shorter journal names, overflow fixes to batsh, sanity fixes.
+	  batsh now works properly. smtpd now puts timeofday in received
+	  header to get a better picture on concurrency. svfilter deliver
+	  script now works in sandbox, and better error reporting for
+	  sf-check.
+
+2004-06-09 15:46  geocar
+
+	* unix/batsh.c: rename deliver.batsh to svfilter.batsh
+
+2004-06-08 22:59  geocar
+
+	* unix/batsh.c, doc/batsh.1: batsh supports multiple invocations
+	  now, some better stat-tests to accomodate test(1) style
+	  comparisons, and updates to the manual page.	new tool: maildir
+	  does qmail-style maildir delivery and added first version of
+	  batsh delivery script
+
+2004-06-07 22:01  geocar
+
+	* unix/batsh.c: added loop-protection, automatic
+	  refrain-from-detach for mproc, some mproc queue-pulls, and some
+	  world-writable protection.
+
+2004-06-02 15:15  geocar
+
+	* doc/batsh.1: lstat fixes, boot fixes
+
+2004-06-01 13:52  geocar
+
+	* doc/batsh.1: adding some documentation
+
+2004-05-31 15:45  geocar
+
+	* unix/batsh.c, common/lock.c: moved locking, also finished batsh
+	  and added to deploy scripts
+
+2004-05-28 22:29  patrick
+
+	* unix/batsh.c: Added batsh
+
