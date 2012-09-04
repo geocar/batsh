@@ -1,0 +1,5 @@
+This is a reliable (journalled) batch processing language.
+
+The idea is that you write a script, and run it through batsh. It creates a journal that remembers the progress
+of your script, so that if it crashes, or a component fails (temporarily for example) you can retry it and the
+execution will resume where you left off.
